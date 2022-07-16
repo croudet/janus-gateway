@@ -1112,7 +1112,9 @@ int janus_process_incoming_request(janus_request *request) {
 	if(session_id == 0 && handle_id == 0) {
 		/* Can only be a 'Create new session', a 'Get info' or a 'Ping/Pong' request */
 		if(!strcasecmp(message_text, "info")) {
-			ret = janus_process_success(request, janus_info(transaction_text));
+			json_t *reply = json_object();
+			json_object_set_new(reply, "janus", json_string("OK"));
+			ret = janus_process_success(request, reply);
 			goto jsondone;
 		}
 		if(!strcasecmp(message_text, "ping")) {
@@ -2136,6 +2138,9 @@ jsondone:
 
 /* Admin/monitor WebServer requests handler */
 int janus_process_incoming_admin_request(janus_request *request) {
+
+	// Admin endpoint is disabled by default
+
 	int ret = -1;
 	int error_code = 0;
 	char error_cause[100];
