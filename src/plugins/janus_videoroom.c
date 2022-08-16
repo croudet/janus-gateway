@@ -1597,7 +1597,6 @@ static struct janus_json_parameter adminkey_parameters[] = {
 	{"admin_key", JSON_STRING, JANUS_JSON_PARAM_REQUIRED}
 };
 static struct janus_json_parameter create_parameters[] = {
-	{"create_checksum", JSON_STRING, 0},
 	{"description", JSON_STRING, 0},
 	{"is_private", JANUS_JSON_BOOL, 0},
 	{"allowed", JSON_ARRAY, 0},
@@ -1704,7 +1703,6 @@ static struct janus_json_parameter moderate_parameters[] = {
 	{"mute", JANUS_JSON_BOOL, JANUS_JSON_PARAM_REQUIRED}
 };
 static struct janus_json_parameter join_parameters[] = {
-	{"join_checksum", JSON_STRING, 0},
 	{"ptype", JSON_STRING, JANUS_JSON_PARAM_REQUIRED},
 	{"audio", JANUS_JSON_BOOL, 0},
 	{"video", JANUS_JSON_BOOL, 0},
@@ -3954,7 +3952,7 @@ static void janus_videoroom_leave_or_unpublish(janus_videoroom_publisher *partic
 		json_object_set_new(info, "event", json_string(is_leaving ? (kicked ? "kicked" : "leaving") : "unpublished"));
 		json_object_set_new(info, "room", string_ids ? json_string(participant->room_id_str) : json_integer(participant->room_id));
 		json_object_set_new(info, "id", string_ids ? json_string(participant->user_id_str) : json_integer(participant->user_id));
-		/* BB - Replaced hardcoded NULL with session varialbe */
+		/* BB - Replaced hardcoded NULL with session variable */
 		gateway->notify_event(&janus_videoroom_plugin, session ? session->handle : NULL, info);
 	}
 	if(is_leaving) {
