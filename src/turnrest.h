@@ -32,8 +32,11 @@ void janus_turnrest_deinit(void);
  * TURN REST API entirely)
  * @param key The API key, if any (pass NULL if it's not required)
  * @param method The HTTP method to use, POST or GET (NULL means POST)
- * @param timeout The timeout in seconds */
-void janus_turnrest_set_backend(const char *server, const char *key, const char *method, const uint timeout);
+ * @param timeout The timeout in seconds
+ * @param tls_verify_host When false turn off ssl host verification
+ * @param tls_verify_certificate When false turn off ssl certificate verification */
+void janus_turnrest_set_backend(const char *server, const char *key, const char *method, const uint timeout,
+ 								const gboolean tls_verify_host, const gboolean tls_verify_certificate);
 /*! \brief Get the currently set TURN REST API backend
  * @returns The currently set TURN REST API backend */
 const char *janus_turnrest_get_backend(void);

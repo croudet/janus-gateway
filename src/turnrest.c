@@ -31,6 +31,8 @@
 static const char *api_server = NULL;
 static const char *api_key = NULL;
 static gboolean api_http_get = FALSE;
+static gboolean api_tls_verify_host = TRUE;
+static gboolean api_tls_verify_certificate = TRUE;
 static uint api_timeout;
 static janus_mutex api_mutex = JANUS_MUTEX_INITIALIZER;
 
@@ -70,7 +72,8 @@ void janus_turnrest_deinit(void) {
 	janus_mutex_unlock(&api_mutex);
 }
 
-void janus_turnrest_set_backend(const char *server, const char *key, const char *method, const uint timeout) {
+void janus_turnrest_set_backend(const char *server, const char *key, const char *method, const uint timeout,
+								const gboolean tls_verify_host, const gboolean tls_verify_certificate) {
 	janus_mutex_lock(&api_mutex);
 
 	/* Get rid of the old values first */
@@ -79,6 +82,8 @@ void janus_turnrest_set_backend(const char *server, const char *key, const char 
 	g_free((char *)api_key);
 	api_key = NULL;
 
+    api_tls_verify_host = tls_verify_host;
+    api_tls_verify_certificate = tls_verify_certificate;
 	if(server != NULL) {
 		/* Set a new server now */
 		api_server = g_strdup(server);
@@ -165,6 +170,13 @@ janus_turnrest_response *janus_turnrest_request(const char *user) {
 	g_snprintf(request_uri, 1024, "%s?%s", api_server, query_string);
 	JANUS_LOG(LOG_VERB, "Sending request: %s\n", request_uri);
 	janus_mutex_unlock(&api_mutex);
+	if (!api_tls_verify_certificate) {
+		JANUS_LOG(LOG_VERB, "Turning off ssl certificate verification\n");
+		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+	} else if (!api_tls_verify_host) {
+		JANUS_LOG(LOG_VERB, "Turning off ssl hostname verification\n");
+		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+	}
 	curl_easy_setopt(curl, CURLOPT_URL, request_uri);
 	curl_easy_setopt(curl, (api_http_get ? CURLOPT_HTTPGET : CURLOPT_POST), 1);
 	if(!api_http_get) {
